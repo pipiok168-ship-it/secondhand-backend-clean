@@ -5,6 +5,11 @@ const multer = require("multer");
 const path = require("path");
 
 // =======================
+// 雲端 base URL（很重要）
+// =======================
+const BASE_URL = "https://secondhand-backend-clean.zeabur.app";
+
+// =======================
 // Multer 設定（上傳圖片）
 // =======================
 const storage = multer.diskStorage({
@@ -59,9 +64,9 @@ router.post("/", upload.array("images"), async (req, res) => {
       return res.status(400).json({ message: "缺少 name 或 price" });
     }
 
-    // ⭐ 關鍵：用目前請求的網域產生圖片網址（本機 / 雲端都通）
+    // ⭐ 關鍵：存「完整雲端圖片網址」
     const imageUrls = (req.files || []).map(file => {
-      return `${req.protocol}://${req.get("host")}/uploads/${file.filename}`;
+      return `${BASE_URL}/uploads/${file.filename}`;
     });
 
     const product = new Product({
