@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
 const cors = require("cors");
+const fs = require("fs");
 
 const app = express();
 
@@ -21,18 +22,37 @@ app.get("/", (req, res) => {
 
 // ===== Routes =====
 const productRoutes = require("./routes/products");
-const authRoutes = require("./routes/auth");
-const googleChatRoute = require("./routes/googleChat"); // ✅ 你原本就有
-const qnaRoutes = require("./routes/qna");              // 🔥 新增
-
 app.use("/api/products", productRoutes);
-app.use("/api/auth", authRoutes);
 
-// 🔥 掛 QnA（注意是 /api，不是 /api/products）
-app.use("/api", qnaRoutes);
+// ✅ auth（可選：檔案存在才掛）
+const authPath = path.join(__dirname, "routes", "auth.js");
+if (fs.existsSync(authPath)) {
+  const authRoutes = require("./routes/auth");
+  app.use("/api/auth", authRoutes);
+  console.log("✅ auth routes loaded");
+} else {
+  console.log("⚠️ auth routes missing, skipped");
+}
 
-// 🔥 掛 Google Chat Bot
-googleChatRoute(app);
+// ✅ googleChat（可選：檔案存在才掛）
+const googleChatPath = path.join(__dirname, "routes", "googleChat.js");
+if (fs.existsSync(googleChatPath)) {
+  const googleChatRoute = require("./routes/googleChat");
+  googleChatRoute(app);
+  console.log("✅ googleChat routes loaded");
+} else {
+  console.log("⚠️ googleChat routes missing, skipped");
+}
+
+// ✅ qna（如果你有做就掛）
+const qnaPath = path.join(__dirname, "routes", "qna.js");
+if (fs.existsSync(qnaPath)) {
+  const qnaRoutes = require("./routes/qna");
+  app.use("/api", qnaRoutes);
+  console.log("✅ qna routes loaded");
+} else {
+  console.log("⚠️ qna routes missing, skipped");
+}
 
 // ===== MongoDB =====
 mongoose
