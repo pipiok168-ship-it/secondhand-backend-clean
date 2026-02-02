@@ -17,6 +17,9 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Build output (if any)
+# Build output
 dist/
 build/
+
+# Package manager lockfiles (avoid mixing)
+pnpm-lock.yaml
